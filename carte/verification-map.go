@@ -18,7 +18,6 @@ func ContientSeulement(grille [][]rune, autorises []rune) bool {
 }
 
 func ValidMap(grille [][]rune) string {
-
 	if len(grille[0]) < 4 || len(grille[1]) < 12 || len(grille[2]) < 7 || len(grille[3]) < 10 {
 		return "map invalide"
 	}
@@ -134,13 +133,36 @@ func ValidMap(grille [][]rune) string {
 			if i == len(grille) && string(grille[i]) != bordure {
 				return "map invalide"
 			}
+			
 		}
 		
 	}
 
+	//verification des spawn
+	nbrPerso1 := 0
+	nbrPerso2 := 0
+
+	for i := start; i < len(grille); i++ {
+		for j := range grille[i] {
+			if grille[i][j] == '1' {
+				nbrPerso1 += 1
+			}
+			if grille[i][j] == '2' {
+				nbrPerso2 += 1
+			}
+		}
+	}
+
+	if nbrPerso1 != 1 || nbrPerso2 != 1 {
+		return "map inavalide"
+	}
+
+
+
 
 	print(longueur)
 	fmt.Println()
+
 	print(largeur)
 	return "\nmap valide"
 }
