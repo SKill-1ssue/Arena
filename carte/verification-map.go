@@ -1,6 +1,21 @@
 package carte
 
-import "fmt"
+import (
+	"fmt"
+	"slices"
+)
+
+func ContientSeulement(grille [][]rune, autorises []rune) bool {
+    for _, ligne := range grille {
+        for _, char := range ligne {
+            // Si une case n'est PAS dans la liste des autorisés
+            if !slices.Contains(autorises, char) {
+                return false 
+            }
+        }
+    }
+    return true
+}
 
 func ValidMap(grille [][]rune) string {
 
@@ -18,7 +33,7 @@ func ValidMap(grille [][]rune) string {
 		return "map invalide"
 	}
 	for i := 11; i < len(grille[1]); i++ {
-		if grille[1][i] < '0' || grille[1][i] > '9' {
+		if grille[1][i] < '1' || grille[1][i] > '3' {
 			return "map invalide"
 		}
 	}
@@ -65,13 +80,46 @@ func ValidMap(grille [][]rune) string {
 	}
 
 	// verification du fait que les dimentions de la grille correspondent aux dimentions de TAILLE
-	if len(grille[4:]) != largeur {
+
+
+	// Tableau (slice) de tous les symboles autorisés sur la carte
+	start := 0
+	for s := range grille {
+		if grille[s][0] == '#' {
+			start = s
+			break
+		}
+	}
+	if start == 0 {
+		return "map invalide"
+	} 
+	if len(grille[start:]) != largeur {
 		return "map invalide"
 	}
-	for i := 4; i < len(grille); i++ {
+	for i := start; i < len(grille); i++ {
+
 		if len(grille[i]) != longueur {
 			return "map invalide"
 		}
+	}
+
+
+	var symbolesValides = []rune{
+		'#', // Mur
+		'.', // Sol
+		'~', // Eau
+		'^', // Piège
+		'+', // Soin
+		'*', // Munitions
+		'!', // Bouclier
+		'$', // Trésor
+		'1', // Départ joueur 1
+		'2', // Départ joueur 2
+	}
+	grilleSymbole := grille[start:]
+
+	if !ContientSeulement(grilleSymbole,symbolesValides) {
+		return "map invalide"
 	}
 
 	print(longueur)
