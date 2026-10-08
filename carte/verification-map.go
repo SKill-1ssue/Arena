@@ -80,9 +80,6 @@ func ValidMap(grille [][]rune) string {
 	}
 
 	// verification du fait que les dimentions de la grille correspondent aux dimentions de TAILLE
-
-
-	// Tableau (slice) de tous les symboles autorisés sur la carte
 	start := 0
 	for s := range grille {
 		if grille[s][0] == '#' {
@@ -103,7 +100,7 @@ func ValidMap(grille [][]rune) string {
 		}
 	}
 
-
+	//verification que la map ne contient que les symboles autorises
 	var symbolesValides = []rune{
 		'#', // Mur
 		'.', // Sol
@@ -121,6 +118,26 @@ func ValidMap(grille [][]rune) string {
 	if !ContientSeulement(grilleSymbole,symbolesValides) {
 		return "map invalide"
 	}
+
+	//verification que les bordures de la map soient toujours des #
+	bordure := ""
+	for i := 0; i < longueur; i++ {
+		bordure += "#"
+	}
+	if string(grille[start]) != bordure {
+		return "map invalide"
+	} else {
+		for i := start+1; i < len(grille); i++ {
+			if grille[i][0] != '#' && grille[i][longueur-1] != '#' {
+				return "map invalide"
+			}
+			if i == len(grille) && string(grille[i]) != bordure {
+				return "map invalide"
+			}
+		}
+		
+	}
+
 
 	print(longueur)
 	fmt.Println()
