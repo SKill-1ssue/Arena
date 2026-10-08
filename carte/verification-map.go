@@ -33,7 +33,7 @@ func ValidMap(grille [][]rune) string {
 		}
 	}
 
-	//verification taille et prise des dimentions du tableau
+	//verification taille et prise des dimentions de la map dans TAILLE
 	if string(grille[3][0:7]) != "TAILLE " {
 		return "map invalide"
 	}
@@ -61,6 +61,16 @@ func ValidMap(grille [][]rune) string {
 
 		if flag == 1 {
 			largeur = largeur*10 + int(grille[3][i] - '0')
+		}
+	}
+
+	// verification du fait que les dimentions de la grille correspondent aux dimentions de TAILLE
+	if len(grille[4:]) != largeur {
+		return "map invalide"
+	}
+	for i := 4; i < len(grille); i++ {
+		if len(grille[i]) != longueur {
+			return "map invalide"
 		}
 	}
 
