@@ -3,18 +3,19 @@ package carte
 import (
 	"fmt"
 	"slices"
+	"strconv"
 )
 
-func ContientSeulement(grille [][]rune, autorises []rune) bool {
-    for _, ligne := range grille {
-        for _, char := range ligne {
+func ContientSeulement(grille [][]rune, autorises []rune) (bool,int,int) {
+    for i, ligne := range grille {
+        for j, char := range ligne {
             // Si une case n'est PAS dans la liste des autorisés
             if !slices.Contains(autorises, char) {
-                return false 
+                return false, i, j 
             }
         }
     }
-    return true
+    return true, 0,0
 }
 
 func ValidMap(grille [][]rune) string {
@@ -24,32 +25,32 @@ func ValidMap(grille [][]rune) string {
 
 	//verification nom
 	if string(grille[0][0:4]) != "NOM " {
-		return "map invalide"
+		return "<fichier> ligne 1 : clé inconnue " + string(grille[0][0:4])
 	}
 
 	//verification difficulte
 	if string(grille[1][0:11]) != "DIFFICULTE " {
-		return "map invalide"
+		return "<fichier> ligne 2 : clé inconnue " + string(grille[1][0:11])
 	}
 	for i := 11; i < len(grille[1]); i++ {
 		if grille[1][i] < '1' || grille[1][i] > '3' {
-			return "map invalide"
+			return "<fichier> ligne 2 : DIFFICULTE attend une valeur comprise entre 1 et 3"
 		}
 	}
 
 	//verification tours
 	if string(grille[2][0:6]) != "TOURS " {
-		return "map invalide"
+		return "<fichier> ligne 3 : clé inconnue " + string(grille[2][0:6])
 	}
 	for i := 6; i < len(grille[2])-1; i++ {
 		if grille[2][i] < '0' || grille[2][i] > '9' {
-			return "map invalide"
+			return "<fichier> ligne 3 : TOUR attend une valeur numérique"
 		}
 	}
 
 	//verification taille et prise des dimentions de la map dans TAILLE
 	if string(grille[3][0:7]) != "TAILLE " {
-		return "map invalide"
+		return "<fichier> ligne 4 : clé inconnue " + string(grille[2][0:6])
 	}
 
 	longueur := 0
@@ -59,14 +60,14 @@ func ValidMap(grille [][]rune) string {
 	for i := 7; i < len(grille[3]); i++ {
 		if grille[3][i] == ' ' {
 			if grille[3][i-1] == ' ' {
-				return "map invalide"
+				return "<fichier> ligne 4 : TAILLE attend des valeur numérique"
 			}
 			flag = 1
 			continue
 		}
 
 		if grille[3][i] < '0' || grille[3][i] > '9' {
-			return "map invalide"
+			return "<fichier> ligne 4 : TAILLE attend des valeur numérique"
 		}
 
 		if flag == 0 {
@@ -90,12 +91,12 @@ func ValidMap(grille [][]rune) string {
 		return "map invalide"
 	} 
 	if len(grille[start:]) != largeur {
-		return "map invalide"
+		return "<fichier> : " + strconv.Itoa(len(grille[start:])) + " lignes de grille, " + strconv.Itoa(largeur) + " attendues"
 	}
 	for i := start; i < len(grille); i++ {
 
 		if len(grille[i]) != longueur {
-			return "map invalide"
+			return "<fichier> ligne " + strconv.Itoa(i+1) + " : " + strconv.Itoa(len(grille[i])) + " cases, " + strconv.Itoa(longueur)+ " attendues"
 		}
 	}
 
@@ -114,8 +115,10 @@ func ValidMap(grille [][]rune) string {
 	}
 	grilleSymbole := grille[start:]
 
-	if !ContientSeulement(grilleSymbole,symbolesValides) {
-		return "map invalide"
+	boolean, x, y := ContientSeulement(grilleSymbole,symbolesValides)
+
+	if !boolean {
+		return "<fichier> ligne " + strconv.Itoa(x+5) + " colonne " + strconv.Itoa(y+1) + " : symbole inconnu: " + string(grille[x+4][y])
 	}
 
 	//verification que les bordures de la map soient toujours des #
@@ -124,16 +127,26 @@ func ValidMap(grille [][]rune) string {
 		bordure += "#"
 	}
 	if string(grille[start]) != bordure {
-		return "map invalide"
+		for i := range grille[start] {
+			if grille[start][i] != '#' {
+				return "<fichier> ligne " + strconv.Itoa(start+1) + " colonne " + strconv.Itoa(i+1) + " : la bordure doit être un mur"
+			}
+		}
+		
 	} else {
 		for i := start+1; i < len(grille); i++ {
-			if grille[i][0] != '#' && grille[i][longueur-1] != '#' {
-				return "map invalide"
+			if grille[i][0] != '#' {
+				return "<fichier> ligne " + strconv.Itoa(i+1) + " colonne " + strconv.Itoa(1) + " : la bordure doit être un mur"
 			}
-			if i == len(grille) && string(grille[i]) != bordure {
-				return "map invalide"
+			if grille[i][longueur-1] != '#' {
+				return "<fichier> ligne " + strconv.Itoa(i+1) + " colonne " + strconv.Itoa(longueur) + " : la bordure doit être un mur"
+			}	
+		}
+
+		for i := range grille[len(grille)-1] {
+			if grille[len(grille)-1][i] != '#' {
+				return "<fichier> ligne " + strconv.Itoa(len(grille)) + " colonne " + strconv.Itoa(i+1) + " : la bordure doit être un mur"
 			}
-			
 		}
 		
 	}
@@ -152,10 +165,20 @@ func ValidMap(grille [][]rune) string {
 			}
 		}
 	}
+	switch {
+	case nbrPerso1 > 1:
+		return "départ du joueur 1 déjà défini"
 
-	if nbrPerso1 != 1 || nbrPerso2 != 1 {
-		return "map inavalide"
+	case nbrPerso2 > 1:
+		return "départ du joueur 2 déjà défini"
+
+	case nbrPerso1 == 0:
+		return "<fivhier> : aucun départ pour le joueur 1"
+
+	case nbrPerso2 == 0:
+		return "<fichier> : aucun départ pour le joueur 2"
 	}
+
 
 
 

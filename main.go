@@ -9,7 +9,7 @@ import (
 
 func main() {
 	// 1. On récupère la grille et l'erreur
-	grille, err := carte.Parse(`C:\Users\USER\Arena\carte\arene.map`)
+	grille, err := carte.Parse(`C:\Users\USER\Arena\carte\iles.map`)
 	
 	// 2. On vérifie s'il y a une erreur
 	if err != nil {
