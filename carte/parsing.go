@@ -27,7 +27,6 @@ func Parse(fichier string) ([][]rune,error) {
 	}
 
 	return grille, nil
-
 }
 
 

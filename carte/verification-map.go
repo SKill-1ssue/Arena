@@ -179,10 +179,6 @@ func ValidMap(grille [][]rune) string {
 		return "<fichier> : aucun départ pour le joueur 2"
 	}
 
-
-
-
-
 	print(longueur)
 	fmt.Println()
 
