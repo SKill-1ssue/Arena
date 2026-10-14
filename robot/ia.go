@@ -33,27 +33,68 @@ func Decider(d protocol.Donnees) string {
 	monPos := Point{X: d.X1, Y: d.Y1}
 	ennemiPos := Point{X: d.X2, Y: d.Y2}
 
-	// Nettoyage de la case si on vient de ramasser un objet
-	if len(grille) > d.Y1 && len(grille[d.Y1]) > d.X1 {
-		c := grille[d.Y1][d.X1]
-		if c == '$' || c == '+' || c == '*' || c == '!' {
-			grille[d.Y1][d.X1] = '.'
+	// Synchronisation dynamique des objets en v2 sur la grille
+	actualiserObjetsSurGrille(d)
+
+	// 1. URGENCE SOIN : PV <= 40
+	if d.Vie1 <= 40 {
+		if posSoin, trouve := trouverRunePlusProche(monPos, '+'); trouve {
+			if ordre := ChercherPoint(monPos, posSoin); ordre != "" {
+				return ordre
+			}
 		}
 	}
 
-	// 1. Priorité Combat : Tirer si l'ennemi est en ligne de vue (<= 5 cases)
-	if tir := peutTirer(d.X1, d.Y1, d.X2, d.Y2); tir != "" {
-		return tir
+	// 2. URGENCE MUNITIONS : 0 balle restante
+	if d.Mun1 == 0 {
+		if posMun, trouve := trouverRunePlusProche(monPos, '*'); trouve {
+			if ordre := ChercherPoint(monPos, posMun); ordre != "" {
+				return ordre
+			}
+		}
 	}
 
-	// 2. Priorité Objets : Chercher le bonus/soin/trésor/munitions le plus proche
-	if posBonus, trouve := trouverBonusPlusProche(monPos); trouve {
-		if ordre := ChercherPoint(monPos, posBonus); ordre != "" {
+	// 3. COMBAT : Tirer uniquement si l'ennemi est à portée ET qu'il reste des munitions
+	
+		
+	
+	if d.Mun1 > 0 {
+		if tir := peutTirer(d.X1, d.Y1, d.X2, d.Y2); tir != "" {
+			return tir
+		}
+	}
+	if tir := peutTirer(d.X1, d.Y1, d.X2, d.Y2); tir != "" {
+			return tir
+	}
+	
+	
+
+	// 4. PRIORITÉ SCORE : Trésors '$' (+50 pts)
+	if posTresor, trouve := trouverRunePlusProche(monPos, '$'); trouve {
+		if ordre := ChercherPoint(monPos, posTresor); ordre != "" {
 			return ordre
 		}
 	}
 
-	// 3. Priorité Traque : Chasser l'ennemi en temps réel
+	// 5. AUTRES OBJETS : Boucliers '!', Munitions '*' (si < 10), Soins '+' (si < 100 PV)
+	var objetsRecherches []rune
+	objetsRecherches = append(objetsRecherches, '!')
+	if d.Mun1 < 10 {
+		objetsRecherches = append(objetsRecherches, '*')
+	}
+	if d.Vie1 < 80 {
+		objetsRecherches = append(objetsRecherches, '+')
+	}
+
+	if len(objetsRecherches) > 0 {
+		if posBonus, trouve := trouverRunePlusProche(monPos, objetsRecherches...); trouve {
+			if ordre := ChercherPoint(monPos, posBonus); ordre != "" {
+				return ordre
+			}
+		}
+	}
+
+	// 6. TRAQUE : Chasser l'adversaire
 	if ordre := ChercherPoint(monPos, ennemiPos); ordre != "" {
 		return ordre
 	}
@@ -61,7 +102,63 @@ func Decider(d protocol.Donnees) string {
 	return "ATTENDS"
 }
 
-// ChercherPoint calcule le chemin optimal en attribuant un coût à chaque type de case
+// Nettoie les anciens objets et place ceux envoyés par l'arbitre au tour actuel
+func actualiserObjetsSurGrille(d protocol.Donnees) {
+	for y := 0; y < len(grille); y++ {
+		for x := 0; x < len(grille[y]); x++ {
+			c := grille[y][x]
+			if c == '$' || c == '+' || c == '*' || c == '!' {
+				grille[y][x] = '.'
+			}
+		}
+	}
+
+	for _, obj := range d.Objets {
+		var r rune
+		switch obj.Type {
+		case "SOIN":
+			r = '+'
+		case "MUNITION":
+			r = '*'
+		case "BOUCLIER":
+			r = '!'
+		case "TRESOR":
+			r = '$'
+		}
+		if r != 0 && obj.Y < len(grille) && obj.X < len(grille[obj.Y]) {
+			grille[obj.Y][obj.X] = r
+		}
+	}
+}
+
+func trouverRunePlusProche(depart Point, cibleRunes ...rune) (Point, bool) {
+	var meilleurPoint Point
+	minDist := 999999
+
+	for y := 0; y < len(grille); y++ {
+		for x := 0; x < len(grille[y]); x++ {
+			c := grille[y][x]
+			for _, cible := range cibleRunes {
+				if c == cible {
+					dist := abs(x-depart.X) + abs(y-depart.Y)
+					if dist < minDist {
+						minDist = dist
+						meilleurPoint = Point{X: x, Y: y}
+					}
+				}
+			}
+		}
+	}
+	return meilleurPoint, minDist < 999999
+}
+
+func abs(v int) int {
+	if v < 0 {
+		return -v
+	}
+	return v
+}
+
 func ChercherPoint(depart Point, destination Point) string {
 	if depart == destination {
 		return ""
@@ -110,15 +207,10 @@ func ChercherPoint(depart Point, destination Point) string {
 			if ny >= 0 && ny < len(grille) && nx >= 0 && nx < len(grille[0]) {
 				caseVoisine := grille[ny][nx]
 
-				// Seuls les murs sont totalement infranchissables
 				if caseVoisine == '#' {
 					continue
 				}
 
-				// PONDÉRATION DES TILES :
-				// - Sol (.), Départs (1, 2), Objets (+, $, *, !) = 1 tour
-				// - Eau (~) = 2 tours (déplacement + 1 tour gelé)
-				// - Piège (^) = 10 tours (le robot contourne sauf si c'est la seule voie)
 				coutDeplacement := 1
 				switch caseVoisine {
 				case '~':
@@ -150,35 +242,8 @@ func ChercherPoint(depart Point, destination Point) string {
 	return ""
 }
 
-// Recherche le bonus ('$', '+', '*', '!') le plus proche sur la carte
-func trouverBonusPlusProche(depart Point) (Point, bool) {
-	var meilleurPoint Point
-	minDist := 999999
-
-	for y := 0; y < len(grille); y++ {
-		for x := 0; x < len(grille[y]); x++ {
-			c := grille[y][x]
-			if c == '$' || c == '+' || c == '*' || c == '!' {
-				dist := abs(x-depart.X) + abs(y-depart.Y)
-				if dist < minDist {
-					minDist = dist
-					meilleurPoint = Point{X: x, Y: y}
-				}
-			}
-		}
-	}
-	return meilleurPoint, minDist < 999999
-}
-
-func abs(v int) int {
-	if v < 0 {
-		return -v
-	}
-	return v
-}
-
 func peutTirer(x1, y1, x2, y2 int) string {
-	if y1 == y2 && x1 < x2 && x2-x1 <= 5 {
+	if y1 == y2 && x1 < x2 && x2-x1 <= 6 {
 		for i := x1 + 1; i < x2; i++ {
 			if grille[y1][i] == '#' {
 				return ""
@@ -186,7 +251,7 @@ func peutTirer(x1, y1, x2, y2 int) string {
 		}
 		return "TIRE E"
 	}
-	if y1 == y2 && x1 > x2 && x1-x2 <= 5 {
+	if y1 == y2 && x1 > x2 && x1-x2 <= 6 {
 		for i := x2 + 1; i < x1; i++ {
 			if grille[y1][i] == '#' {
 				return ""
@@ -194,7 +259,7 @@ func peutTirer(x1, y1, x2, y2 int) string {
 		}
 		return "TIRE O"
 	}
-	if x1 == x2 && y1 < y2 && y2-y1 <= 5 {
+	if x1 == x2 && y1 < y2 && y2-y1 <= 6 {
 		for i := y1 + 1; i < y2; i++ {
 			if grille[i][x1] == '#' {
 				return ""
@@ -202,7 +267,7 @@ func peutTirer(x1, y1, x2, y2 int) string {
 		}
 		return "TIRE S"
 	}
-	if x1 == x2 && y1 > y2 && y1-y2 <= 5 {
+	if x1 == x2 && y1 > y2 && y1-y2 <= 6 {
 		for i := y2 + 1; i < y1; i++ {
 			if grille[i][x1] == '#' {
 				return ""
@@ -238,3 +303,7 @@ func chargerCarteDepuisFlag() {
 		}
 	}
 }
+
+//func predirePosition() Point {
+	
+//}
