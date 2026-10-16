@@ -1,0 +1,73 @@
+T1 | (21,11) 100 PV | AVANCE O | approche une case de tir
+T2 | (20,11) 100 PV | AVANCE O | approche une case de tir
+T3 | (19,11) 100 PV | AVANCE O | approche une case de tir
+T4 | (18,11) 100 PV | AVANCE O | approche une case de tir
+T5 | (17,11) 100 PV | AVANCE N | ramasse un objet proche
+T6 | (17,10) 100 PV | AVANCE N | ramasse un objet proche
+T7 | (17,9) 100 PV | AVANCE E | ramasse un objet proche
+T8 | (18,9) 100 PV | AVANCE E | ramasse un objet proche
+T9 | (19,9) 100 PV | AVANCE N | ramasse un objet proche
+T10 | (19,8) 100 PV | AVANCE N | ramasse un objet proche
+T11 | (19,7) 100 PV | AVANCE O | approche une case de tir
+T12 | (18,7) 100 PV | AVANCE O | approche une case de tir
+T13 | (17,7) 100 PV | AVANCE O | approche une case de tir
+T14 | (16,7) 100 PV | AVANCE O | approche une case de tir
+T15 | (15,7) 100 PV | AVANCE S | ramasse un objet proche
+T16 | (15,8) 100 PV | AVANCE S | ramasse un objet proche
+T17 | (15,9) 100 PV | AVANCE S | ramasse un objet proche
+T18 | (15,10) 100 PV | AVANCE S | ramasse un objet proche
+T19 | (15,11) 100 PV | AVANCE O | ramasse un objet proche
+T20 | (14,11) 100 PV | AVANCE O | ramasse un objet proche
+T21 | (13,11) 100 PV | AVANCE O | approche une case de tir
+T22 | (12,11) 100 PV | AVANCE O | approche une case de tir
+T23 | (11,11) 100 PV | AVANCE O | approche une case de tir
+T24 | (10,11) 100 PV | AVANCE O | approche une case de tir
+T25 | (9,11) 100 PV | AVANCE N | ramasse un objet proche
+T26 | (9,10) 100 PV | AVANCE N | ramasse un objet proche
+T27 | (9,9) 100 PV | AVANCE N | ramasse un objet proche
+T28 | (9,8) 100 PV | AVANCE N | ramasse un objet proche
+T29 | (9,7) 100 PV | AVANCE O | ramasse un objet proche
+T30 | (8,7) 100 PV | TIRE E | tir anticipé sur son prochain pas
+T31 | (8,7) 100 PV | TIRE E | tir anticipé sur son prochain pas
+T32 | (8,7) 100 PV | TIRE E | tir anticipé sur son prochain pas
+T33 | (8,7) 100 PV | TIRE E | tir anticipé sur son prochain pas
+T34 | (8,7) 100 PV | TIRE E | tir anticipé sur son prochain pas
+T35 | (8,7) 100 PV | TIRE E | tir anticipé sur son prochain pas
+T36 | (8,7) 100 PV | TIRE E | tir anticipé sur son prochain pas
+T37 | (8,7) 100 PV | TIRE E | échange favorable
+T38 | (8,7) 100 PV | TIRE E | échange favorable
+T39 | (8,7) 100 PV | AVANCE O | ramasse un objet proche
+T40 | (7,7) 100 PV | AVANCE E | approche une case de tir
+T41 | (8,7) 100 PV | AVANCE E | approche une case de tir
+T42 | (9,7) 100 PV | ATTENDS | embuscade
+T43 | (9,7) 100 PV | ATTENDS | embuscade
+T44 | (9,7) 100 PV | ATTENDS | embuscade
+T45 | (9,7) 100 PV | AVANCE N | approche une case de tir
+T46 | (9,6) 80 PV | TIRE E | échange favorable
+T47 | (9,6) 80 PV | AVANCE S | cherche des munitions
+T48 | (9,7) 80 PV | AVANCE S | cherche des munitions
+T49 | (9,8) 80 PV | AVANCE S | cherche des munitions
+T50 | (9,9) 80 PV | AVANCE S | cherche des munitions
+T51 | (9,10) 80 PV | AVANCE S | cherche des munitions
+T52 | (9,11) 80 PV | AVANCE E | cherche des munitions
+T53 | (10,11) 80 PV | AVANCE E | cherche des munitions
+T54 | (11,11) 80 PV | AVANCE E | cherche des munitions
+T55 | (12,11) 80 PV | AVANCE E | cherche des munitions
+T56 | (13,11) 80 PV | AVANCE E | cherche des munitions
+T57 | (14,11) 80 PV | AVANCE E | cherche des munitions
+T58 | (15,11) 80 PV | AVANCE N | cherche des munitions
+T59 | (15,10) 80 PV | AVANCE N | cherche des munitions
+T60 | (15,9) 80 PV | AVANCE N | cherche des munitions
+T61 | (15,8) 80 PV | AVANCE N | cherche des munitions
+T62 | (15,7) 80 PV | AVANCE E | cherche des munitions
+T63 | (16,7) 80 PV | AVANCE E | cherche des munitions
+T64 | (17,7) 80 PV | AVANCE N | cherche des munitions
+T65 | (17,6) 80 PV | AVANCE S | approche une case de tir
+T66 | (17,7) 80 PV | AVANCE O | approche une case de tir
+T67 | (16,7) 80 PV | ATTENDS | embuscade
+T68 | (16,7) 80 PV | ATTENDS | embuscade
+T69 | (16,7) 80 PV | ATTENDS | embuscade
+T70 | (16,7) 80 PV | AVANCE O | approche une case de tir
+T71 | (15,7) 80 PV | TIRE S | échange favorable
+T72 | (15,7) 60 PV | TIRE S | échange favorable
+T73 | (15,7) 40 PV | TIRE S | achève l'ennemi

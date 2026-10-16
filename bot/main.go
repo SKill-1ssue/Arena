@@ -5,9 +5,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
-
-	// Remplace "Arena" par le nom exact inscrit dans ton fichier go.mod si ce n'est pas Arena
+	
 	"github.com/votre-pseudo/arena/carte"
+	"github.com/votre-pseudo/arena/journal"
 	"github.com/votre-pseudo/arena/protocol"
 	"github.com/votre-pseudo/arena/robot"
 )
@@ -32,15 +32,20 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	// 4. Boucle principale du jeu
+	tour := 1
+	journal.SupLogs()
 	for {
-		// Étape A : Ton package protocol lit l'arbitre jusqu'à "FIN"
+		
+		// package protocol lit l'arbitre jusqu'à "FIN"
 		donnees := protocol.Extraction(scanner)
 
-		// Étape B : Ton package robot (fichier ia.go) prend la décision
-		// Assure-toi que dans robot/ia.go tu as "package robot" et une fonction "Decider"
+		//  package robot (fichier ia.go) prend la décision
 		action := robot.Decider(donnees)
 
-		// Étape C : Envoi de la commande à l'arbitre sur os.Stdout
+		//  Envoi de la commande à l'arbitre sur os.Stdout
 		fmt.Println(action)
+
+		journal.EcrireLog(tour,action)
+		tour++
 	}
 }

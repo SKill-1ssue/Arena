@@ -11,6 +11,10 @@ type Objet struct {
 	Type string // "SOIN", "MUNITION", "BOUCLIER", "TRESOR"
 }
 
+type Point struct {
+	X, Y int
+}
+
 type Donnees struct {
 	Tour      int
 	Vie1      int
@@ -26,6 +30,8 @@ type Donnees struct {
 	Bouclier2 int
 
 	Objets    []Objet
+	Position1 []Point
+	Position2 []Point
 }
 
 func Extraction(scanner *bufio.Scanner) Donnees {
@@ -56,6 +62,8 @@ func Extraction(scanner *bufio.Scanner) Donnees {
 				d.Y1, _ = strconv.Atoi(mots[2])
 				d.Vie1, _ = strconv.Atoi(mots[4])
 
+				d.Position2 = append(d.Position2, Point{X:d.X1, Y:d.Y1})
+
 				// En v2 : MOI x y VIE v MUN m BOUCLIER b (len = 9)
 				if len(mots) >= 9 {
 					d.Mun1, _ = strconv.Atoi(mots[6])
@@ -68,6 +76,8 @@ func Extraction(scanner *bufio.Scanner) Donnees {
 				d.X2, _ = strconv.Atoi(mots[1])
 				d.Y2, _ = strconv.Atoi(mots[2])
 				d.Vie2, _ = strconv.Atoi(mots[4])
+				
+				d.Position2 = append(d.Position2, Point{X:d.X2, Y:d.Y2})
 			}
 
 		case "OBJET":
